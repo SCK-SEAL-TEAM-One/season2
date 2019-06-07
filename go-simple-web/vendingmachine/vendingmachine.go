@@ -1,17 +1,17 @@
 package vendingmachine
 
 type VendingMachine struct {
-	TotalCoins int
+	totalCoins int
 	m          map[string]int
 }
 
 func (v VendingMachine) ShowTotalBalance() int {
-	return v.TotalCoins
+	return v.totalCoins
 }
 
 func (v *VendingMachine) InsertCoins(coin string) {
 	elem := v.m[coin]
-	v.TotalCoins += elem
+	v.totalCoins += elem
 }
 
 func NewVendingMachine() VendingMachine {
@@ -34,21 +34,28 @@ func (v *VendingMachine) BuyDrink(drink string) string {
 	if !ok {
 		return "No Item"
 	}
-	if v.TotalCoins < price {
+	if v.totalCoins < price {
 		return "Add more money"
 	}
-	v.TotalCoins -= price
-	return drink + v.ChangeCoins()
+	v.totalCoins -= price
+
+	if v.totalCoins == 0 {
+		return drink
+	}
+	return drink + ", " + v.changeCoins()
 }
 
-func (v *VendingMachine) ChangeCoins() string {
+func (v *VendingMachine) changeCoins() string {
 	var changeCoin string
 	coinsValue := [4]int{10, 5, 2, 1}
 	coinsText := [4]string{"T", "F", "TW", "O"}
 	for counter := 0; counter < len(coinsValue); counter++ {
-		for v.TotalCoins >= coinsValue[counter] {
-			changeCoin += ", " + coinsText[counter]
-			v.TotalCoins -= coinsValue[counter]
+		for v.totalCoins >= coinsValue[counter] {
+			changeCoin += coinsText[counter]
+			v.totalCoins -= coinsValue[counter]
+			if v.totalCoins != 0 {
+				changeCoin += ", "
+			}
 		}
 	}
 	return changeCoin
